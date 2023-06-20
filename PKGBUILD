@@ -3,7 +3,7 @@
 # Contributor: David Birks <david@birks.dev>
 
 pkgname=aws-cli-v2
-pkgver=2.11.27
+pkgver=2.12.1
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -21,7 +21,7 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         build-ac.index-in-tmp.diff
         fix-env.diff
         "$pkgname-tz-fix.patch::https://github.com/aws/aws-cli/pull/7762.patch")
-sha256sums=('47734ebd63e37a6a4b1e5133d3451e43a14622d9183ac47abb41c32fa1c015e9'
+sha256sums=('5c6298d42f8a8800e0aeca7257e2bf2207af1060a49e2e71c02e3cae3b391f38'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
