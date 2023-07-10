@@ -3,7 +3,7 @@
 # Contributor: David Birks <david@birks.dev>
 
 pkgname=aws-cli-v2
-pkgver=2.12.6
+pkgver=2.13.0
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -20,13 +20,15 @@ conflicts=(aws-cli)
 source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         build-ac.index-in-tmp.diff
         fix-env.diff
-        "$pkgname-tz-fix.patch::https://github.com/aws/aws-cli/pull/7762.patch"
+        "$pkgname-tz-fix.patch::https://github.com/aws/aws-cli/commit/95aa5ccc7bfaeafc0373e8472c8459030ac18920.patch"
+        "${pkgname}-fix-zsh-completions.patch::https://github.com/aws/aws-cli/commit/006957ebf258e39fd1692151166a1d245e06a32f.patch"
         ruamel-yaml-0.17.22.diff)
-sha256sums=('f9759db394a2c6eb31fb12f7a6475b8ee60cecf0c2e62bd22991a74856f1f7d0'
+sha256sums=('c4bb0f2eac848733ef1f2754ce7c06e7d81b759fffb6e8e768a10ec4f08bbd86'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
             '4fc614b8550d7363bb2d578c6b49326c9255203eb2f933fd0551f96ed5fb1f30'
+            '0e4064c45e8f987fd8aaa48e1b289de413d96168fc14432c2072a03068358742'
             '4f05e77fe667aa8a5bab643dc6b9888045c7646913ed6b999952150b60651e90')
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
@@ -46,6 +48,10 @@ prepare() {
 
   # Fix possible test failure with a non-UTC time zone (https://bugs.archlinux.org/task/77919)
   patch -Np1 -i ../$pkgname-tz-fix.patch
+
+  # Make zsh completions automatically enabled
+  # From https://github.com/aws/aws-cli/pull/2708 (unmerged)
+  patch -Np1 -i ../${pkgname}-fix-zsh-completions.patch
 
   # Fix tests with ruamel.yaml >= 0.17.22
   # From https://sourceforge.net/p/ruamel-yaml/code/ci/0.17.22/tree/CHANGES,
@@ -84,4 +90,5 @@ package() {
   python -m installer --destdir="$pkgdir" dist/*.whl
   install -Dm 644 LICENSE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
   install -Dm 644 bin/aws_bash_completer "$pkgdir/usr/share/bash-completion/completions/aws"
+  install -Dm 644 bin/aws_zsh_completer.sh "${pkgdir}/usr/share/zsh/site-functions/_aws"
 }
