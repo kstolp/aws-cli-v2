@@ -3,7 +3,7 @@
 # Contributor: David Birks <david@birks.dev>
 
 pkgname=aws-cli-v2
-pkgver=2.13.0
+pkgver=2.13.1
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -23,7 +23,7 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         "$pkgname-tz-fix.patch::https://github.com/aws/aws-cli/commit/95aa5ccc7bfaeafc0373e8472c8459030ac18920.patch"
         "${pkgname}-fix-zsh-completions.patch::https://github.com/aws/aws-cli/commit/006957ebf258e39fd1692151166a1d245e06a32f.patch"
         ruamel-yaml-0.17.22.diff)
-sha256sums=('c4bb0f2eac848733ef1f2754ce7c06e7d81b759fffb6e8e768a10ec4f08bbd86'
+sha256sums=('74c5468c4d2d38f32d5cc4aa01c5059fee9de8f6c9fac217e8780821b27ce3fc'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
