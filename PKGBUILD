@@ -3,7 +3,7 @@
 # Contributor: David Birks <david@birks.dev>
 
 pkgname=aws-cli-v2
-pkgver=2.13.1
+pkgver=2.13.5
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -22,14 +22,14 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         fix-env.diff
         "$pkgname-tz-fix.patch::https://github.com/aws/aws-cli/commit/95aa5ccc7bfaeafc0373e8472c8459030ac18920.patch"
         "${pkgname}-fix-zsh-completions.patch::https://github.com/aws/aws-cli/commit/006957ebf258e39fd1692151166a1d245e06a32f.patch"
-        ruamel-yaml-0.17.22.diff)
-sha256sums=('74c5468c4d2d38f32d5cc4aa01c5059fee9de8f6c9fac217e8780821b27ce3fc'
+        "${pkgname}-ruamel-yaml-0.17.22.patch::https://github.com/aws/aws-cli/commit/96c855c44a6bd05e52cf98fa3c8e00db637f0a7b.patch")
+sha256sums=('0463afda7018f41f22200648068e95e5595bde72328e3edc8e1db0772edc807f'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
             '4fc614b8550d7363bb2d578c6b49326c9255203eb2f933fd0551f96ed5fb1f30'
             '0e4064c45e8f987fd8aaa48e1b289de413d96168fc14432c2072a03068358742'
-            '4f05e77fe667aa8a5bab643dc6b9888045c7646913ed6b999952150b60651e90')
+            '12f9aacb46e5754ea3935b29e07033285cdf66047fc39520d9f716b33edb5a7e')
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 )
@@ -54,10 +54,8 @@ prepare() {
   patch -Np1 -i ../${pkgname}-fix-zsh-completions.patch
 
   # Fix tests with ruamel.yaml >= 0.17.22
-  # From https://sourceforge.net/p/ruamel-yaml/code/ci/0.17.22/tree/CHANGES,
-  # "plain scalars: put single words longer than width on a line of their own, instead of after the previous line"
-  # XXX: I should open a pull request, but I am hesitant as many upstream pull requests are just ignored
-  patch -Np1 -i ../ruamel-yaml-0.17.22.diff
+  # https://github.com/aws/aws-cli/pull/8072 (unmerged)
+  patch -Np1 -i ../${pkgname}-ruamel-yaml-0.17.22.patch
 }
 
 build() {
