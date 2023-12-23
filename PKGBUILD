@@ -4,7 +4,7 @@
 
 pkgname=aws-cli-v2
 # https://github.com/aws/aws-cli/raw/v2/CHANGELOG.rst
-pkgver=2.15.2
+pkgver=2.15.4
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -15,7 +15,7 @@ depends=(python python-awscrt python-certifi python-colorama python-cryptography
          python-urllib3)
 makedepends=(python-build python-wheel python-flit-core python-installer)
 # Tests need the 'ps' binary
-checkdepends=(python-pytest python-pytest-xdist python-jsonschema python-mock procps-ng)
+checkdepends=(python-pytest python-pytest-xdist python-jsonschema procps-ng)
 provides=(aws-cli)
 conflicts=(aws-cli)
 install=aws-cli-v2.install
@@ -24,7 +24,7 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         fix-env.diff
         "$pkgname-tz-fix.patch::https://github.com/aws/aws-cli/commit/95aa5ccc7bfaeafc0373e8472c8459030ac18920.patch"
         "${pkgname}-ruamel-yaml-v4.patch::https://github.com/aws/aws-cli/commit/0331e399231b6cdb54b7b3bdd01a793647053cdd.patch")
-sha256sums=('279daffc11d4e0ec5ce2b05d9eea2167e484d747ee76096b125cc4198da3ed92'
+sha256sums=('0ac61007556657be2c696afda9f2af198b423d4193d0447c7c8a4a659f949ba6'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
@@ -52,6 +52,14 @@ prepare() {
   # Fix tests with newer ruamel.yaml
   # https://github.com/aws/aws-cli/pull/8072 (unmerged)
   patch -Np1 -i ../${pkgname}-ruamel-yaml-v4.patch
+
+  # use unittest.mock
+  # https://src.fedoraproject.org/rpms/awscli2/blob/rawhide/f/awscli2.spec
+  find -type f -name '*.py' -exec sed \
+      -e 's/^\( *\)import mock$/\1from unittest import mock/' \
+      -e 's/^\( *\)from mock import mock/\1from unittest import mock/' \
+      -e 's/^\( *\)from mock import/\1from unittest.mock import/' \
+      -i '{}' +
 }
 
 build() {
