@@ -22,7 +22,7 @@ install=aws-cli-v2.install
 source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         build-ac.index-in-tmp.diff
         fix-env.diff
-        "$pkgname-tz-fix.patch::https://github.com/aws/aws-cli/commit/95aa5ccc7bfaeafc0373e8472c8459030ac18920.patch"
+        "$pkgname-tz-fix.patch"
         "${pkgname}-ruamel-yaml-v4.patch")
 sha256sums=('a76984fe18376791a838f012a2cd1b6344d4b6d4e89e4140c00b4e9902f2bcf0'
             'SKIP'
