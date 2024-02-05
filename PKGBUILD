@@ -4,7 +4,7 @@
 
 pkgname=aws-cli-v2
 # https://github.com/aws/aws-cli/raw/v2/CHANGELOG.rst
-pkgver=2.15.10
+pkgver=2.15.17
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -23,13 +23,15 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         build-ac.index-in-tmp.diff
         fix-env.diff
         "$pkgname-tz-fix.patch"
-        "${pkgname}-ruamel-yaml-v4.patch")
-sha256sums=('a76984fe18376791a838f012a2cd1b6344d4b6d4e89e4140c00b4e9902f2bcf0'
+        "${pkgname}-ruamel-yaml-v4.patch"
+        allow-egg-info.diff)
+sha256sums=('f8172666cd5437d0314bfc3965a25701c21536b5ceef82080a2fb14a420a9b0c'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
             '4fc614b8550d7363bb2d578c6b49326c9255203eb2f933fd0551f96ed5fb1f30'
-            '20a9fcd5235bf606e86a6ec06ca30307ebbcfd36063d2ac561c1f9eff7243046')
+            '20a9fcd5235bf606e86a6ec06ca30307ebbcfd36063d2ac561c1f9eff7243046'
+            '6768df8667fe7fd827e6eef1c4cdb3eae25aba5806bbc725270200a585f62152')
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 )
@@ -52,6 +54,9 @@ prepare() {
   # Fix tests with newer ruamel.yaml
   # https://github.com/aws/aws-cli/pull/8072 (unmerged)
   patch -Np1 -i ../${pkgname}-ruamel-yaml-v4.patch
+
+  # tests/dependencies checks dependencies, and many Arch Linux packages are not using PEP 517 yet
+  patch -Np1 -i ../allow-egg-info.diff
 
   # use unittest.mock
   # https://src.fedoraproject.org/rpms/awscli2/blob/rawhide/f/awscli2.spec
@@ -82,9 +87,13 @@ check() {
 
   export PYTHONPATH="$PWD"
 
+  # Install a temporary copy to a virtual environment, as tests/dependencies checks global site-packages
+  python -m venv --system-site-packages "$PWD/venv"
+  "$PWD/venv/bin/python" -m installer dist/*.whl
+
   # * Use --dist=loadfile following upstream. The default --dist=load may cause test failures and is not faster
   # * Disable backend tests - those tests check if aws-cli can be installed or not, and are not compatible with all kinds of environments
-  pytest tests -n auto --dist loadfile --ignore=tests/backends --ignore=tests/integration
+  "$PWD/venv/bin/python" -m pytest tests -n auto --dist loadfile --ignore=tests/backends --ignore=tests/integration
 }
 
 package() {
