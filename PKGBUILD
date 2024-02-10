@@ -24,14 +24,20 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         fix-env.diff
         "$pkgname-tz-fix.patch"
         "${pkgname}-ruamel-yaml-v4.patch"
-        allow-egg-info.diff)
+        allow-egg-info.diff
+        botocore-2922.patch
+        botocore-2924.patch
+        botocore-2990-rebased.patch)
 sha256sums=('f8172666cd5437d0314bfc3965a25701c21536b5ceef82080a2fb14a420a9b0c'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
             '4fc614b8550d7363bb2d578c6b49326c9255203eb2f933fd0551f96ed5fb1f30'
             '20a9fcd5235bf606e86a6ec06ca30307ebbcfd36063d2ac561c1f9eff7243046'
-            '6768df8667fe7fd827e6eef1c4cdb3eae25aba5806bbc725270200a585f62152')
+            '6768df8667fe7fd827e6eef1c4cdb3eae25aba5806bbc725270200a585f62152'
+            '62be6cad0f9039ae682abffd167181abbd4a690e2680867418c5542893d74b36'
+            'aad8b863d9f9107c56401e71d76b71f526efd9f8efac31e2a007b9071f85b5b6'
+            'a43c3e9aba8974fc09f1780a37b6a94108b15dbbbcecdf6d9e7e224ca135816b')
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 )
@@ -57,6 +63,17 @@ prepare() {
 
   # tests/dependencies checks dependencies, and many Arch Linux packages are not using PEP 517 yet
   patch -Np1 -i ../allow-egg-info.diff
+
+  # Backport fixes for urllib3 2.x to vendored botocore
+  pushd awscli
+  # [Defer to system defaults for cipher suites with urllib3 2.0+](https://github.com/boto/botocore/pull/2922)
+  patch --no-backup-if-mismatch -Np1 -i ../../botocore-2922.patch
+  # [Do not set_ciphers(DEFAULT_CIPHERS) if DEFAULT_CIPHERS is None](https://github.com/boto/botocore/pull/2924)
+  patch --no-backup-if-mismatch -Np1 -i ../../botocore-2924.patch
+  # [Move 100-continue behavior to use high-level request interface](https://github.com/boto/botocore/pull/2990)
+  # Manually rebased due to conflicts from refactoring
+  patch --no-backup-if-mismatch -Np1 -i ../../botocore-2990-rebased.patch
+  popd
 
   # use unittest.mock
   # https://src.fedoraproject.org/rpms/awscli2/blob/rawhide/f/awscli2.spec
