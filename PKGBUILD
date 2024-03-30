@@ -27,7 +27,8 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         allow-egg-info.diff
         botocore-2922.patch
         botocore-2924.patch
-        botocore-2990-rebased.patch)
+        botocore-2990-rebased.patch
+        pytest8.patch)
 sha256sums=('4acf1cbb9bd7f158d13276f18467d9f8fd8dde504e537141fe8899b1273f9d5c'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
@@ -37,7 +38,8 @@ sha256sums=('4acf1cbb9bd7f158d13276f18467d9f8fd8dde504e537141fe8899b1273f9d5c'
             '6768df8667fe7fd827e6eef1c4cdb3eae25aba5806bbc725270200a585f62152'
             '62be6cad0f9039ae682abffd167181abbd4a690e2680867418c5542893d74b36'
             'aad8b863d9f9107c56401e71d76b71f526efd9f8efac31e2a007b9071f85b5b6'
-            'a43c3e9aba8974fc09f1780a37b6a94108b15dbbbcecdf6d9e7e224ca135816b')
+            'a43c3e9aba8974fc09f1780a37b6a94108b15dbbbcecdf6d9e7e224ca135816b'
+            '77a02400b5ce0ff832b2ea1b292937ecf4169196b267d0fdfb6be1fbb5ba3a01')
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 )
@@ -63,6 +65,10 @@ prepare() {
 
   # tests/dependencies checks dependencies, and many Arch Linux packages are not using PEP 517 yet
   patch -Np1 -i ../allow-egg-info.diff
+
+  # Fix pytest-8.0.0 test failures due to incorrect pytest.warns()
+  # https://github.com/aws/aws-cli/pull/8610 (unmerged)
+  patch -Np1 -i ../pytest8.patch
 
   # Backport fixes for urllib3 2.x to vendored botocore
   pushd awscli

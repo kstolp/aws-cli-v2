@@ -1,0 +1,49 @@
+From 426ce33adc76579c1b6583e99ec3fff106208bc8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Micha=C5=82=20G=C3=B3rny?= <mgorny@gentoo.org>
+Date: Thu, 1 Feb 2024 00:23:25 +0100
+Subject: [PATCH] Fix pytest-8.0.0 test failures due to incorrect
+ `pytest.warns()`
+
+This is a port of https://github.com/boto/botocore/pull/3109
+
+Remove two incorrect `pytest.warns()` invocations
+for `.get_component('internal')`, in order to fix test failures
+with pytest 8.0.0.  This version of pytest fixes `pytest.warns()` to
+work inside `pytest.raises()`, and therefore causes the tests to fail
+because the warning is not emitted when `get_component()` raises
+`ValueError`.
+---
+ tests/unit/botocore/test_session.py        | 4 +---
+ tests/unit/botocore/test_session_legacy.py | 4 +---
+ 2 files changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/tests/unit/botocore/test_session.py b/tests/unit/botocore/test_session.py
+index 4ff16e13120a..78eb3e64119b 100644
+--- a/tests/unit/botocore/test_session.py
++++ b/tests/unit/botocore/test_session.py
+@@ -640,9 +640,7 @@ def test_internal_component(self):
+         self.assertIs(
+             self.session._get_internal_component('internal'), component)
+         with self.assertRaises(ValueError):
+-            # get_component has been deprecated to the public
+-            with pytest.warns(DeprecationWarning):
+-                self.session.get_component('internal')
++            self.session.get_component('internal')
+ 
+     def test_internal_endpoint_resolver_is_same_as_deprecated_public(self):
+         endpoint_resolver = self.session._get_internal_component(
+diff --git a/tests/unit/botocore/test_session_legacy.py b/tests/unit/botocore/test_session_legacy.py
+index 27659c96ec16..2c2e00c6078b 100644
+--- a/tests/unit/botocore/test_session_legacy.py
++++ b/tests/unit/botocore/test_session_legacy.py
+@@ -631,9 +631,7 @@ def test_internal_component(self):
+         self.assertIs(
+             self.session._get_internal_component('internal'), component)
+         with self.assertRaises(ValueError):
+-            # get_component has been deprecated to the public
+-            with pytest.warns(DeprecationWarning):
+-                self.session.get_component('internal')
++            self.session.get_component('internal')
+ 
+     def test_internal_endpoint_resolver_is_same_as_deprecated_public(self):
+         endpoint_resolver = self.session._get_internal_component(
