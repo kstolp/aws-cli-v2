@@ -103,6 +103,9 @@ build() {
 }
 
 check() {
+  # Avoid intermittent test failures, see git commit messages
+  ulimit -S -n 4096
+
   cd awscli-$pkgver
 
   export AWS_SECRET_ACCESS_KEY=fake_key
