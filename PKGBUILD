@@ -27,7 +27,8 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         allow-egg-info.diff
         botocore-2922.patch
         botocore-2924.patch
-        botocore-2990-rebased.patch)
+        botocore-2990-rebased.patch
+        botocore-2551.patch)
 sha256sums=('427f27e0ab571dffd37b3995c4e99ab36fe09cb42351747848d7f368843dd65b'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
@@ -37,7 +38,8 @@ sha256sums=('427f27e0ab571dffd37b3995c4e99ab36fe09cb42351747848d7f368843dd65b'
             '6768df8667fe7fd827e6eef1c4cdb3eae25aba5806bbc725270200a585f62152'
             '62be6cad0f9039ae682abffd167181abbd4a690e2680867418c5542893d74b36'
             'aad8b863d9f9107c56401e71d76b71f526efd9f8efac31e2a007b9071f85b5b6'
-            'a43c3e9aba8974fc09f1780a37b6a94108b15dbbbcecdf6d9e7e224ca135816b')
+            'a43c3e9aba8974fc09f1780a37b6a94108b15dbbbcecdf6d9e7e224ca135816b'
+            '778c621885dae2218c840eec06a0e0294df7d1180dea12264b34a93994be7c0d')
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 )
@@ -64,8 +66,9 @@ prepare() {
   # tests/dependencies checks dependencies, and many Arch Linux packages are not using PEP 517 yet
   patch -Np1 -i ../allow-egg-info.diff
 
-  # Backport fixes for urllib3 2.x to vendored botocore
   pushd awscli
+
+  # Backport fixes for urllib3 2.x to vendored botocore
   # [Defer to system defaults for cipher suites with urllib3 2.0+](https://github.com/boto/botocore/pull/2922)
   patch --no-backup-if-mismatch -Np1 -i ../../botocore-2922.patch
   # [Do not set_ciphers(DEFAULT_CIPHERS) if DEFAULT_CIPHERS is None](https://github.com/boto/botocore/pull/2924)
@@ -73,6 +76,11 @@ prepare() {
   # [Move 100-continue behavior to use high-level request interface](https://github.com/boto/botocore/pull/2990)
   # Manually rebased due to conflicts from refactoring
   patch --no-backup-if-mismatch -Np1 -i ../../botocore-2990-rebased.patch
+
+  # Backport an update to vendored six.py for compatibility with Python 3.12
+  # [Update six from 1.10.0 to 1.16.0](https://github.com/boto/botocore/pull/2551)
+  patch --no-backup-if-mismatch -Np1 -i ../../botocore-2551.patch
+
   popd
 
   # use unittest.mock
