@@ -4,7 +4,7 @@
 
 pkgname=aws-cli-v2
 # https://github.com/aws/aws-cli/raw/v2/CHANGELOG.rst
-pkgver=2.15.36
+pkgver=2.15.40
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -28,8 +28,10 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         botocore-2922.patch
         botocore-2924.patch
         botocore-2990-rebased.patch
-        botocore-2551.patch)
-sha256sums=('427f27e0ab571dffd37b3995c4e99ab36fe09cb42351747848d7f368843dd65b'
+        botocore-2551.patch
+        aws-cli-v2-8106.patch
+        botocore-2967.patch)
+sha256sums=('8d5999a66814cb658d16efde27faa9e46e0b140365262af6bae9cc0536d4d3f8'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
@@ -39,7 +41,9 @@ sha256sums=('427f27e0ab571dffd37b3995c4e99ab36fe09cb42351747848d7f368843dd65b'
             '62be6cad0f9039ae682abffd167181abbd4a690e2680867418c5542893d74b36'
             'aad8b863d9f9107c56401e71d76b71f526efd9f8efac31e2a007b9071f85b5b6'
             'a43c3e9aba8974fc09f1780a37b6a94108b15dbbbcecdf6d9e7e224ca135816b'
-            '778c621885dae2218c840eec06a0e0294df7d1180dea12264b34a93994be7c0d')
+            '778c621885dae2218c840eec06a0e0294df7d1180dea12264b34a93994be7c0d'
+            '2a22315f1877917370a22bc6023aa01de5f4c661f980f638e32fa4d6681a40c6'
+            '24dffdc1d03e8a5745606b82f3b1af44523ccee257b618620307ae6c596e7e5e')
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 )
@@ -65,6 +69,10 @@ prepare() {
 
   # tests/dependencies checks dependencies, and many Arch Linux packages are not using PEP 517 yet
   patch -Np1 -i ../allow-egg-info.diff
+
+  # Python 3.12 patches from https://github.com/aws/aws-cli/issues/8342#issuecomment-2067638456
+  patch -Np1 -i ../aws-cli-v2-8106.patch
+  patch -Np1 -i ../botocore-2967.patch
 
   pushd awscli
 
