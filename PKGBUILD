@@ -5,7 +5,7 @@
 pkgname=aws-cli-v2
 # https://github.com/aws/aws-cli/raw/v2/CHANGELOG.rst
 pkgver=2.15.40
-pkgrel=2
+pkgrel=3
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
 url='https://github.com/aws/aws-cli/tree/v2'
@@ -47,8 +47,6 @@ sha256sums=('8d5999a66814cb658d16efde27faa9e46e0b140365262af6bae9cc0536d4d3f8'
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 )
-
-BUILDENV+=('!check')
 
 prepare() {
   cd awscli-$pkgver
@@ -131,7 +129,7 @@ check() {
 
   # * Use --dist=loadfile following upstream. The default --dist=load may cause test failures and is not faster
   # * Disable backend tests - those tests check if aws-cli can be installed or not, and are not compatible with all kinds of environments
-  "$PWD/venv/bin/python" -m pytest tests -n auto --dist loadfile --ignore=tests/backends --ignore=tests/integration
+  "$PWD/venv/bin/python" -m pytest tests -n 2 --dist loadfile --ignore=tests/backends --ignore=tests/integration
 }
 
 package() {
