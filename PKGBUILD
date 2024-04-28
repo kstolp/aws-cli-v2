@@ -5,7 +5,7 @@
 pkgname=aws-cli-v2
 # https://github.com/aws/aws-cli/raw/v2/CHANGELOG.rst
 pkgver=2.15.40
-pkgrel=4
+pkgrel=5
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
 url='https://github.com/aws/aws-cli/tree/v2'
@@ -118,6 +118,7 @@ check() {
 
   # Avoid the user's environment variable from being used in the tests
   unset AWS_DEFAULT_PROFILE
+  unset AWS_PROFILE
 
   cd awscli-$pkgver
 
