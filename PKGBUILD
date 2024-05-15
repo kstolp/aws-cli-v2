@@ -5,7 +5,7 @@
 
 pkgname=aws-cli-v2
 # https://github.com/aws/aws-cli/raw/v2/CHANGELOG.rst
-pkgver=2.15.42
+pkgver=2.15.51
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -32,7 +32,7 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         botocore-2551.patch
         aws-cli-v2-8106.patch
         botocore-2967.patch)
-sha256sums=('c121554d1f4e74839289de2eb2d6098d68f0db5af7311b45845c397ff36ab138'
+sha256sums=('c7eb93c28f4bf368b285b192deda520d5049ce2be3da91656184aa8d54ff77ab'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
@@ -126,6 +126,7 @@ check() {
 
   export AWS_SECRET_ACCESS_KEY=fake_key
   export AWS_ACCESS_KEY_ID=fake_id
+  export TZ=UTC
 
   export PYTHONPATH="$PWD"
 
