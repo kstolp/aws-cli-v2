@@ -6,8 +6,8 @@
 
 pkgname=aws-cli-v2
 # https://github.com/aws/aws-cli/raw/v2/CHANGELOG.rst
-pkgver=2.17.51
-pkgrel=2
+pkgver=2.17.52
+pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
 url='https://github.com/aws/aws-cli/tree/v2'
@@ -30,22 +30,18 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         botocore-2922.patch
         botocore-2924.patch
         botocore-2990-rebased.patch
-        botocore-2551.patch
-        aws-cli-v2-8106.patch
-        botocore-2967.patch)
-sha256sums=('ba5f7ea050e9bb8adb7d7b6c8c511f16dd12bf565b0f1f2af07b1d78b8cfdb5c'
+        botocore-2551.patch)
+sha256sums=('e3259c7195af7c2458700adb8ba4034273e96be93dee9ae4ef89f7c3a73a3216'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
             '4fc614b8550d7363bb2d578c6b49326c9255203eb2f933fd0551f96ed5fb1f30'
-            '8015aa8d8ae83dc5bc7b7138826ec1dde3b0be9841bb0a94840739a5db7bd039'
+            'c5f86c18ccffa3b462a8f2c41756d210a49f28e9f38ffe3aec002851f1a2552a'
             '6768df8667fe7fd827e6eef1c4cdb3eae25aba5806bbc725270200a585f62152'
             '62be6cad0f9039ae682abffd167181abbd4a690e2680867418c5542893d74b36'
             'aad8b863d9f9107c56401e71d76b71f526efd9f8efac31e2a007b9071f85b5b6'
             'a43c3e9aba8974fc09f1780a37b6a94108b15dbbbcecdf6d9e7e224ca135816b'
-            '778c621885dae2218c840eec06a0e0294df7d1180dea12264b34a93994be7c0d'
-            '2a22315f1877917370a22bc6023aa01de5f4c661f980f638e32fa4d6681a40c6'
-            '24dffdc1d03e8a5745606b82f3b1af44523ccee257b618620307ae6c596e7e5e')
+            '778c621885dae2218c840eec06a0e0294df7d1180dea12264b34a93994be7c0d')
 validpgpkeys=(
   'FB5DB77FD5C118B80511ADA8A6310ACC4672475C'  # the key mentioned on https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 )
@@ -72,10 +68,6 @@ prepare() {
   # tests/dependencies checks dependencies, and many Arch Linux packages are not using PEP 517 yet
   patch -Np1 -i ../allow-egg-info.diff
 
-  # Python 3.12 patches from https://github.com/aws/aws-cli/issues/8342#issuecomment-2067638456
-  patch -Np1 -i ../aws-cli-v2-8106.patch
-  patch -Np1 -i ../botocore-2967.patch
-
   pushd awscli
 
   # Backport fixes for urllib3 2.x to vendored botocore
@@ -92,14 +84,6 @@ prepare() {
   patch --no-backup-if-mismatch -Np1 -i ../../botocore-2551.patch
 
   popd
-
-  # use unittest.mock
-  # https://src.fedoraproject.org/rpms/awscli2/blob/rawhide/f/awscli2.spec
-  find -type f -name '*.py' -exec sed \
-      -e 's/^\( *\)import mock$/\1from unittest import mock/' \
-      -e 's/^\( *\)from mock import mock/\1from unittest import mock/' \
-      -e 's/^\( *\)from mock import/\1from unittest.mock import/' \
-      -i '{}' +
 }
 
 build() {
@@ -137,7 +121,8 @@ build() {
 #
 #  # * Use --dist=loadfile following upstream. The default --dist=load may cause test failures and is not faster
 #  # * Disable backend tests - those tests check if aws-cli can be installed or not, and are not compatible with all kinds of environments
-#  "$PWD/venv/bin/python" -m pytest tests -n 2 --dist loadfile --ignore=tests/backends --ignore=tests/integration
+#  # * Disable lockfile test since requirements-docs-lock.txt file is not present in downloaded archive
+#  "$PWD/venv/bin/python" -m pytest tests -n 2 --dist loadfile --ignore=tests/backends --ignore=tests/integration --deselect='tests/dependencies/test_closure.py::TestDependencyClosure::test_lockfile_pins_within_runtime_dependencies_bounds[requirements-docs-lock.txt]'
 #}
 
 package() {
