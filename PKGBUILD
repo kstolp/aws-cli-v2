@@ -6,7 +6,7 @@
 
 pkgname=aws-cli-v2
 # https://github.com/aws/aws-cli/raw/v2/CHANGELOG.rst
-pkgver=2.17.53
+pkgver=2.17.54
 pkgrel=1
 pkgdesc='Unified command line interface for Amazon Web Services (version 2)'
 arch=(any)
@@ -27,19 +27,15 @@ source=("https://awscli.amazonaws.com/awscli-$pkgver.tar.gz"{,.sig}
         "$pkgname-tz-fix.patch"
         "${pkgname}-ruamel-yaml-v4.patch"
         allow-egg-info.diff
-        botocore-2922.patch
-        botocore-2924.patch
         botocore-2990-rebased.patch
         botocore-2551.patch)
-sha256sums=('99efeac2a01ed6b97b5dffdc11b8ab5abc0c1e0829681f62864a7e3b0d553b00'
+sha256sums=('2670b9bbf6f011988a27b022d1721dbf6571819cc9ce4152b5a985f90058eeac'
             'SKIP'
             '0267e41561ab2c46a97ebfb024f0b047aabc9e6b9866f204b2c1a84ee5810d63'
             '893d61d7e958c3c02bfa1e03bf58f6f6abd98849d248cc661f1c56423df9f312'
             '4fc614b8550d7363bb2d578c6b49326c9255203eb2f933fd0551f96ed5fb1f30'
             'c5f86c18ccffa3b462a8f2c41756d210a49f28e9f38ffe3aec002851f1a2552a'
             '6768df8667fe7fd827e6eef1c4cdb3eae25aba5806bbc725270200a585f62152'
-            '62be6cad0f9039ae682abffd167181abbd4a690e2680867418c5542893d74b36'
-            'aad8b863d9f9107c56401e71d76b71f526efd9f8efac31e2a007b9071f85b5b6'
             'a43c3e9aba8974fc09f1780a37b6a94108b15dbbbcecdf6d9e7e224ca135816b'
             '778c621885dae2218c840eec06a0e0294df7d1180dea12264b34a93994be7c0d')
 validpgpkeys=(
@@ -71,10 +67,6 @@ prepare() {
   pushd awscli
 
   # Backport fixes for urllib3 2.x to vendored botocore
-  # [Defer to system defaults for cipher suites with urllib3 2.0+](https://github.com/boto/botocore/pull/2922)
-  patch --no-backup-if-mismatch -Np1 -i ../../botocore-2922.patch
-  # [Do not set_ciphers(DEFAULT_CIPHERS) if DEFAULT_CIPHERS is None](https://github.com/boto/botocore/pull/2924)
-  patch --no-backup-if-mismatch -Np1 -i ../../botocore-2924.patch
   # [Move 100-continue behavior to use high-level request interface](https://github.com/boto/botocore/pull/2990)
   # Manually rebased due to conflicts from refactoring
   patch --no-backup-if-mismatch -Np1 -i ../../botocore-2990-rebased.patch
